@@ -13,6 +13,7 @@
         "quotes": [
             "error",
             "double"
-        ]
+        ],
+        "max-classes-per-file": ["error", 5]
     }
 }
