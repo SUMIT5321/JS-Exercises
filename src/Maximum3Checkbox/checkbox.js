@@ -18,6 +18,7 @@ function handleFormClick(event) {
     if (view.checked === true) {
       selectedDays.splice(0, selectedDays.length);
       daysCheckboxes.forEach((element) => {
+        // eslint-disable-next-line no-param-reassign
         element.checked = false;
       });
     }
