@@ -34,7 +34,7 @@ class Clock {
 class AnalogClock extends Clock {
   currentTime() {
     const time = this.getTime();
-    const hourDegree = time.hour24Format * (360 / 12);
+    const hourDegree = time.hour * (360 / 12);
     const minuteDegree = time.minutes * (360 / 60);
     const secondsDegree = time.seconds * (360 / 60);
 
@@ -45,7 +45,7 @@ class AnalogClock extends Clock {
 class DigitalClock extends Clock {
   currentTime() {
     const time = this.getTime();
-    const time12HeFormat = `${time.hour24Format}:${time.minutes}:${time.seconds} ${time.amPM}`;
+    const time12HeFormat = `${time.hour}:${time.minutes}:${time.seconds} ${time.amPM}`;
     return time12HeFormat;
   }
 }
