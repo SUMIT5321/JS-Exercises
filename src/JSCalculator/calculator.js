@@ -7,9 +7,8 @@ const display = document.getElementsByName("display")[0];
  */
 function handleClick(event) {
   const view = event.target;
-  const { type } = view;
 
-  if (type !== "button") return;
+  if (view.type !== "button") return;
   const { value } = view;
 
   if (value === "AC") {
