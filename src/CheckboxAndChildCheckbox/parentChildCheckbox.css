@@ -1,0 +1,28 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.container {
+  background: #fff;
+  margin: 20px;
+}
+
+.innerContainer {
+  height: 100px;
+  width: 50%;
+  min-width: 500px;
+  margin-top: 32px;
+}
+
+form {
+  max-height: 100%;
+  padding: 8px;
+  overflow: auto;
+  border: 1px solid #455052;
+}
+
+.childContainer {
+  padding-left: 20Px;
+}
