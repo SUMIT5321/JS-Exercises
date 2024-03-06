@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <title>Dynamic Table</title>
+        <link rel="stylesheet" href="dynamicTable.css" />
+    </head>
+    <body>
+        <div class="container">
+            <h1>Dynamic Table</h1>
+            <div class="innerContainer">
+              <table id="tableDynamic">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Sumit Raj</td>
+                    <td>sumit@vinsol.com</td>
+                    <td>
+                      <div class="actionContainer">
+                        <div class="link" onclick="handleEdit(event);">Edit</div>
+                        <div>&nbsp;/&nbsp;</div>
+                        <div class="link" onclick="handleDelete(event);">Delete</div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="display: flex; justify-content: start;">
+                <div id="buttonAdd" class="button">Add New Row</div>
+              </div>
+            </div>
+        </div>
+        <script src="dynamicTable.js"></script>
+    </body>
+</html>
