@@ -84,7 +84,5 @@ function handleCheckboxSelection(event) {
   }
 }
 
-document.getElementById("cb-color").addEventListener("click", handleCheckboxSelection);
-document.getElementById("cb-drinks").addEventListener("click", handleCheckboxSelection);
-document.getElementById("cb-movie").addEventListener("click", handleCheckboxSelection);
-document.getElementById("cb-bike").addEventListener("click", handleCheckboxSelection);
+// add click listener to all parent checkboxes
+document.getElementsByName("cb-parent").forEach((element) => element.addEventListener("click", handleCheckboxSelection));
