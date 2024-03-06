@@ -34,6 +34,7 @@ function handleChildCheckboxClick(event) {
 function createCheckbox(data, position) {
   const fragment = document.createDocumentFragment();
   const checkbox = document.createElement("input");
+  const spaceTextNode = document.createTextNode("\t");
   const br = document.createElement("br");
   checkbox.type = "checkbox";
   checkbox.name = data;
@@ -49,6 +50,7 @@ function createCheckbox(data, position) {
 
   if (position !== 0) fragment.appendChild(br);
   fragment.appendChild(checkbox);
+  fragment.appendChild(spaceTextNode);
   fragment.appendChild(label);
   return fragment;
 }
