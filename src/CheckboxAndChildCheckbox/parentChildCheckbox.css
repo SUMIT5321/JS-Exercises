@@ -14,13 +14,13 @@
   width: 50%;
   min-width: 500px;
   margin-top: 32px;
+  border: 1px solid #455052;
 }
 
 form {
   max-height: 100%;
   padding: 8px;
   overflow: auto;
-  border: 1px solid #455052;
 }
 
 .childContainer {
