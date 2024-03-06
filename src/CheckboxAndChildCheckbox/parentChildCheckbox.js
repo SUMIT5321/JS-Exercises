@@ -75,12 +75,13 @@ function addChildCheckboxes(parentCheckboxElement) {
  * @param {MouseEvent} event
  */
 function handleCheckboxSelection(event) {
-  const view = event.target;
+  const htmlInputElement = event.target;
+  const { parentElement } = htmlInputElement;
 
-  if (view.name === "cb-parent" && view.checked === true) {
-    addChildCheckboxes(view);
+  if (htmlInputElement.name === "cb-parent" && htmlInputElement.checked === true) {
+    addChildCheckboxes(htmlInputElement);
   } else {
-    view.parentElement.removeChild(view.parentElement.lastChild);
+    parentElement.removeChild(parentElement.lastChild);
   }
 }
 
