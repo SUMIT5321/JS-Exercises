@@ -1,0 +1,55 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.container {
+  background: #fff;
+  display: flex;
+  justify-content: center;
+}
+
+.innerContainer {
+  width: 600px;
+  background: #eaf2d9;
+  padding-bottom: 32px;
+}
+
+.header {
+  width: 100%;
+  background: #9fb271;
+  color: #fff;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.multiSelectContainer {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 32px;
+}
+
+.selectContainer {
+  width: 30%;
+  height: 100px
+}
+
+select {
+  width: 100%;
+  height:100%
+}
+
+.button {
+  background-color: #687447;
+  color: white;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
