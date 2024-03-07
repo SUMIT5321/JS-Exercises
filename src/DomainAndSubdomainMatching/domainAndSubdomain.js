@@ -9,7 +9,6 @@ class UrlProcessor {
   getDomainAndSubdomain() {
     const domainSubdomainRegex = /^(?:https?:\/\/)?(?:www\.)?(?:([^:/\n]+)\.)?([^:/\n]+\.[^:/\n?#]+)$/;
     const matches = domainSubdomainRegex.exec(this.url);
-    console.log(matches);
 
     return matches ? {
       subdoamin: matches[1],
