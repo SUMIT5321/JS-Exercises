@@ -1,4 +1,11 @@
 /* eslint-disable no-alert */
+const validator = {
+  validateUrl: (url) => {
+    const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
+    return urlPattern.test(url);
+  },
+};
+
 /**
  * Opens given url in new window
  * @param {String} url - url to open
@@ -21,8 +28,8 @@ function openInNewWindow(url) {
 function onPageLoad() {
   const url = prompt("Enter a URL:");
 
-  if (url && url.trim()) {
-    openInNewWindow(url);
+  if (url && validator.validateUrl(url.trim())) {
+    openInNewWindow(url.trim());
   } else {
     alert("Url not valid.");
   }
