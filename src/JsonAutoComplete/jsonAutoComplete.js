@@ -28,7 +28,7 @@ const autoCompleteSearchHelper = {
    * @param {String} input
    * @returns {Array} list of matched names
    */
-  autocompleteSearch(input) {
+  searchNames(input) {
     if (input === "") {
       return [];
     }
@@ -77,7 +77,7 @@ class AutoCompleteElement {
   showResults(event) {
     const inputElement = event.target;
     const input = inputElement.value;
-    const matchedNames = autoCompleteSearchHelper.autocompleteSearch(input);
+    const matchedNames = autoCompleteSearchHelper.searchNames(input);
 
     const ul = document.createElement("ul");
     matchedNames.forEach((match) => {
