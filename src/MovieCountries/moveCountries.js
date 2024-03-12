@@ -1,7 +1,9 @@
 const countriesList = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Côte d'Ivoire", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Congo-Brazzaville)"];
 
 class MultiSelectElement {
-  constructor(leftSelectBox, rightSelectBox, buttonAdd, buttonRemove, optionList) {
+  constructor({
+    leftSelectBox, rightSelectBox, buttonAdd, buttonRemove, optionList,
+  }) {
     this.leftSelectBox = leftSelectBox;
     this.rightSelectBox = rightSelectBox;
     this.buttonAdd = buttonAdd;
@@ -46,7 +48,9 @@ function onLoad() {
   const buttonAdd = document.getElementById("buttonAdd");
   const buttonRemove = document.getElementById("buttonRemove");
   // init country multi select
-  const countrySelecy = new MultiSelectElement(leftSelectBox, rightSelectBox, buttonAdd, buttonRemove, countriesList);
+  const countrySelecy = new MultiSelectElement({
+    leftSelectBox, rightSelectBox, buttonAdd, buttonRemove, optionList: countriesList,
+  });
 }
 
 window.addEventListener("load", onLoad);
