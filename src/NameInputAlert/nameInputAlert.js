@@ -1,15 +1,16 @@
-function forcePrompt(msg) {
-  const value = prompt(msg);
+const pageCreator = {
+  forcePrompt(msg) {
+    const value = prompt(msg);
 
-  if (value && value.trim()) return value;
-  return forcePrompt(msg);
-}
+    if (value && value.trim()) return value;
+    return this.forcePrompt(msg);
+  },
+  createPage() {
+    const firstName = this.forcePrompt("Enter first name");
+    const lastName = this.forcePrompt("Enter last name");
 
-function onPageLoad() {
-  const firstName = forcePrompt("Enter first name");
-  const lastName = forcePrompt("Enter last name");
+    document.write(`Hello, ${firstName} ${lastName}`);
+  },
+};
 
-  document.write(`Hello, ${firstName} ${lastName}`);
-}
-
-window.addEventListener("load", onPageLoad);
+pageCreator.createPage.call(pageCreator);
