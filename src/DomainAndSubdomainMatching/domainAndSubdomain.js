@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 const form = document.forms[0];
 const urlInputField = form.elements[0];
 
