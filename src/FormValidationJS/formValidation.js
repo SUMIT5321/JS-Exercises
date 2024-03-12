@@ -40,7 +40,7 @@ class User {
     if (!validator.validateString(this.name)) errorMsgs.push("Name can't be empty.");
     if (!validator.validateUrl(this.homePage)) errorMsgs.push("Enter a valid Home page URL");
     if (!validator.validateString(this.aboutMe, 50)) errorMsgs.push("Enter atleast 50 characters about yourself.");
-    if (this.receiveCommentsNotification) errorMsgs.push("Please check receive notification");
+    if (!this.receiveCommentsNotification) errorMsgs.push("Please check receive notification");
 
     return errorMsgs;
   }
@@ -76,7 +76,7 @@ function handleFromSubmit() {
         formData.aboutMe = element.value;
         break;
       case "cbReceiveNotification":
-        formData.receiveCommentsNotification = element.value;
+        formData.receiveCommentsNotification = element.checked;
         break;
       default:
         break;
