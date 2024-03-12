@@ -85,7 +85,6 @@ function handleFromSubmit() {
   const user = new User(formData);
 
   const formErrors = user.validate();
-
   if (formErrors.length === 0) {
     form.submit();
     showAlert("Thanks. Received your details.");
