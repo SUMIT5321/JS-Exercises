@@ -5,87 +5,90 @@ const childCheckBoxes = {
   bikes: ["V-rod", "Pulsar", "cbz"],
 };
 
-/**
- * Handles child checkbox click
- * @param {MouseEvent} event
- */
-function handleChildCheckboxClick(event) {
-  const childView = event.target;
-  const parent = childView.parentElement;
+class NestedCheckbox {
+  constructor(parentCheckbox, chidrenData) {
+    this.parentCheckbox = parentCheckbox;
+    this.chidrenData = chidrenData;
 
-  const areAllChecked = [...parent.childNodes].reduce(
-    ((previous, current) => current.checked || previous),
-    false,
-  );
-
-  if (!areAllChecked) {
-    const superParent = parent.parentElement;
-    superParent.removeChild(parent);
-    superParent.querySelector("[name='cb-parent']").checked = false;
+    parentCheckbox.addEventListener("click", this.handleParentCheckboxSelection.bind(this));
   }
-}
 
-/**
- * Creates a checkbox, returns it wrapped in a DocumentFragment
- * @param {String} data - data to be used to create child checkbox
- * @param {Number} position - postion of the checkbox in the list
- * @returns {DocumentFragment} - returns DocumentFragment wrapping checkbox with its lable
- */
-function createCheckbox(data, position) {
-  const fragment = document.createDocumentFragment();
-  const checkbox = document.createElement("input");
-  const spaceTextNode = document.createTextNode("\t");
-  const br = document.createElement("br");
-  checkbox.type = "checkbox";
-  checkbox.name = data;
-  checkbox.id = data;
-  checkbox.value = data;
-  checkbox.checked = true;
-  checkbox.onclick = handleChildCheckboxClick;
+  handleParentCheckboxSelection() {
+    const { parentElement } = this.parentCheckbox;
 
-  const label = document.createElement("label");
-  const tn = document.createTextNode(data);
-  label.htmlFor = data;
-  label.appendChild(tn);
+    if (this.parentCheckbox.checked === true) {
+      this.addChildCheckboxes();
+    } else {
+      parentElement.removeChild(parentElement.lastChild);
+    }
+  }
 
-  if (position !== 0) fragment.appendChild(br);
-  fragment.appendChild(checkbox);
-  fragment.appendChild(spaceTextNode);
-  fragment.appendChild(label);
-  return fragment;
-}
+  /**
+  * Adds child checkboxes for given input checkbox
+  */
+  addChildCheckboxes() {
+    const childContainer = document.createElement("div");
+    childContainer.classList.add("childContainer");
+    const children = this.chidrenData;
 
-/**
- * Adds child checkboxes for given input checkbox
- * @param {HTMLInputElement} parentCheckboxElement
- */
-function addChildCheckboxes(parentCheckboxElement) {
-  const childContainer = document.createElement("div");
-  childContainer.classList.add("childContainer");
-  const children = childCheckBoxes[parentCheckboxElement.value];
+    children.forEach((element, position) => {
+      childContainer.appendChild(this.createChildCheckbox(element, position));
+    });
 
-  children.forEach((element, position) => {
-    childContainer.appendChild(createCheckbox(element, position));
-  });
+    this.parentCheckbox.parentElement.append(childContainer);
+    this.parentCheckbox.scrollIntoView({ behavior: "smooth" });
+  }
 
-  parentCheckboxElement.parentElement.append(childContainer);
-  parentCheckboxElement.scrollIntoView({ behavior: "smooth" });
-}
+  /**
+   * Creates a checkbox, returns it wrapped in a DocumentFragment
+   * @param {String} data - data to be used to create child checkbox
+   * @param {Number} position - postion of the checkbox in the list
+   * @returns {DocumentFragment} - returns DocumentFragment wrapping checkbox with its lable
+   */
+  createChildCheckbox(data, position) {
+    const fragment = document.createDocumentFragment();
+    const checkbox = document.createElement("input");
+    const spaceTextNode = document.createTextNode("\t");
+    const br = document.createElement("br");
+    checkbox.type = "checkbox";
+    checkbox.name = data;
+    checkbox.id = data;
+    checkbox.value = data;
+    checkbox.checked = true;
+    checkbox.onclick = this.handleChildCheckboxClick.bind(this);
 
-/**
- * Handles parent checkbox selection
- * @param {MouseEvent} event
- */
-function handleCheckboxSelection(event) {
-  const htmlInputElement = event.target;
-  const { parentElement } = htmlInputElement;
+    const label = document.createElement("label");
+    const tn = document.createTextNode(data);
+    label.htmlFor = data;
+    label.appendChild(tn);
 
-  if (htmlInputElement.name === "cb-parent" && htmlInputElement.checked === true) {
-    addChildCheckboxes(htmlInputElement);
-  } else {
-    parentElement.removeChild(parentElement.lastChild);
+    if (position !== 0) fragment.appendChild(br);
+    fragment.appendChild(checkbox);
+    fragment.appendChild(spaceTextNode);
+    fragment.appendChild(label);
+    return fragment;
+  }
+
+  /**
+   * Handles child checkbox click
+   * @param {MouseEvent} event
+   */
+  handleChildCheckboxClick(event) {
+    const childView = event.target;
+    const childContainer = childView.parentElement;
+
+    const areAllChecked = [...childContainer.childNodes].reduce(
+      ((previous, current) => current.checked || previous),
+      false,
+    );
+
+    if (!areAllChecked) {
+      const superParent = childContainer.parentElement;
+      superParent.removeChild(childContainer);
+      this.parentCheckbox.checked = false;
+    }
   }
 }
 
 // add click listener to all parent checkboxes
-document.getElementsByName("cb-parent").forEach((element) => element.addEventListener("click", handleCheckboxSelection));
+document.getElementsByName("cb-parent").forEach((element) => new NestedCheckbox(element, childCheckBoxes[element.value]));
