@@ -95,3 +95,19 @@ form {
   display: flex;
   justify-content: center;
 }
+
+.topMargin16 {
+  margin-top: 16px;
+}
+
+.passwordMessage {
+  display: flex; 
+  justify-content: center; 
+  margin-top: 48px; 
+  font-size: 14px;
+}
+
+.centerContent {
+  display: flex; 
+  justify-content: center;
+}

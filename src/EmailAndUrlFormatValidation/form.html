@@ -10,48 +10,48 @@
               <form>
                 <div class="formRow">
                   <div class="label">Login Id</div>
-                  <input class="inputText" id="inputLoginId" type="text" required>
+                  <input class="inputText" data-inputfield="loginId" type="text" required>
                 </div>
 
                 <div class="formRow">
                   <div class="label">Email</div>
-                  <input class="inputText" id="inputEmail" type="email" required>
+                  <input class="inputText" data-inputfield="email" type="email" required>
                 </div>
 
                 <div class="formRow">
                   <div class="label">Name</div>
-                  <input class="inputText" id="inputName" type="text" required>
+                  <input class="inputText" data-inputfield="name" type="text" required>
                 </div>
 
                 <div class="formRow">
                   <div class="label">TimeZone</div>
-                  <select class="dropdown" id="inputTimeZone" required>
-                    <option value="volvo">GMT</option>
-                    <option value="saab">IST</option>
-                    <option value="mercedes">EST</option>
-                    <option value="audi">PST</option>
+                  <select class="dropdown" data-inputfield="timeZone" required>
+                    <option value="gmt">GMT</option>
+                    <option value="ist">IST</option>
+                    <option value="est">EST</option>
+                    <option value="pst">PST</option>
                   </select>
                 </div>
 
                 <div class="formRow">
                   <div class="label">Home Page</div>
-                  <input class="inputText" id="inputHomePage" type="text" required>
+                  <input class="inputText" data-inputfield="homePage" type="text" required>
                 </div>
                 
-                <div class="label" style="margin-top: 16px;">About Me</div>
-                <textarea class="about" id="inputTextArea" minLength="50" required></textarea>
+                <div class="label topMargin16">About Me</div>
+                <textarea class="about" data-inputfield="aboutMe" minLength="50" required></textarea>
 
                 <div class="checkbox">
-                  <input type="checkbox" id="cbReceiveNotification" required/>
+                  <input type="checkbox" data-inputfield="receiveNotification" required/>
                   <label for="cbReceiveNotification">Receive notification of comments.</label><br>
                 </div>
                 <div class="note">
                   You will be sent an email when someone posts comments to your Blog or Album.
                 </div>
 
-                <div style="display: flex; justify-content: center; margin-top: 48px; font-size: 14px;">Your password will be mailed to you.</div>
+                <div class="passwordMessage">Your password will be mailed to you.</div>
 
-                <div style="display: flex; justify-content: center;">
+                <div class="centerContent">
                   <div id="buttonGo" class="button">GO</div>
                 </div>
               </form>
