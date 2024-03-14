@@ -1,13 +1,18 @@
 /* eslint-disable no-alert */
-const urlHandler = {
+
+class UrlHandler {
+  constructor(url) {
+    this.url = url;
+  }
+
   /**
   * Opens given url in new window
   * @param {String} url - url to open
   */
-  openInNewWindow(url) {
+  #openInNewWindow() {
     let blocked = false;
     try {
-      const newWindow = window.open(url, "_blank", "location=yes,height=400,width=450,scrollbars=false,status=false,toolbar=false");
+      const newWindow = window.open(this.url, "_blank", "location=yes,height=400,width=450,scrollbars=false,status=false,toolbar=false");
       if (newWindow == null) {
         blocked = true;
       }
@@ -17,29 +22,34 @@ const urlHandler = {
     if (blocked) {
       alert("The popup was blocked!");
     }
-  },
+  }
 
   /**
    * validates if url is valid
    * @param {String} url
    * @returns {Boolean}
    */
-  validateUrl(url) {
+  #validateUrl() {
     const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
-    return urlPattern.test(url);
-  },
+    return urlPattern.test(this.url);
+  }
 
-  /**
-   * show prompt to user
-   */
-  showUrlPrompt() {
-    const url = prompt("Enter a URL:");
-    if (url && this.validateUrl(url.trim())) {
-      this.openInNewWindow(url.trim());
+  #validateAndOpen() {
+    if (this.url && this.#validateUrl()) {
+      this.#openInNewWindow();
     } else {
       alert("Url not valid.");
     }
-  },
-};
+  }
 
-window.addEventListener("load", urlHandler.showUrlPrompt.bind(urlHandler));
+  /**
+   * show prompt to user and returns UrlHandler
+   */
+  static takeUrlAndOpen() {
+    const url = prompt("Enter a URL:");
+    const urlHandler = new UrlHandler(url);
+    urlHandler.#validateAndOpen();
+  }
+}
+
+window.addEventListener("load", UrlHandler.takeUrlAndOpen.bind(UrlHandler));
