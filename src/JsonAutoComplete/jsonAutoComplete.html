@@ -10,12 +10,16 @@
               <form>
                 <div class="formRow">
                   <div class="label">Enter Name</div>
-                  <input id="inputName" class="inputText" type="text" autocomplete="off">
+                  <input data-input="name" class="inputText" type="text" autocomplete="off">
                 </div>
                 <div class="formRow zeroMarginTop">
                   <div class="label"></div>
                   <div>
-                    <div class="autoResult" id="autoResult"></div>
+                    <div class="autoResult" data-autoResult="outerAutoResult" id="autoResult">
+                      <ul data-autoResult="innerAutoResult">
+                        <li data-name="sample">sample</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </form>

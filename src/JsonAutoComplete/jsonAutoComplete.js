@@ -1,53 +1,70 @@
-const autoCompleteSearchHelper = {
-  names: [
-    { name: "Luigi Damiano" },
-    { name: "Zenith Coboro" },
-    { name: "Zig Ziglar" },
-    { name: "Steve Costner" },
-    { name: "Bill Grazer" },
-    { name: "Timothy Frazer" },
-    { name: "Boris Becker" },
-    { name: "Glenn Gladwich" },
-    { name: "Jim Jackson" },
-    { name: "Aaron Kabin" },
-    { name: "Roy Goldwin" },
-    { name: "Jason Goldberg" },
-    { name: "Tim Ferris" },
-    { name: "Buck Singham" },
-    { name: "Malcom Gladwell" },
-    { name: "Joy Rabura" },
-    { name: "Vid Luther" },
-    { name: "Tom Glicken" },
-    { name: "Ray Baxter" },
-    { name: "Ari Kama" },
-    { name: "Kenichi Suzuki" },
-    { name: "Rick Olson" },
-  ],
+const names = [
+  { name: "Luigi Damiano" },
+  { name: "Zenith Coboro" },
+  { name: "Zig Ziglar" },
+  { name: "Steve Costner" },
+  { name: "Bill Grazer" },
+  { name: "Timothy Frazer" },
+  { name: "Boris Becker" },
+  { name: "Glenn Gladwich" },
+  { name: "Jim Jackson" },
+  { name: "Aaron Kabin" },
+  { name: "Roy Goldwin" },
+  { name: "Jason Goldberg" },
+  { name: "Tim Ferris" },
+  { name: "Buck Singham" },
+  { name: "Malcom Gladwell" },
+  { name: "Joy Rabura" },
+  { name: "Vid Luther" },
+  { name: "Tom Glicken" },
+  { name: "Ray Baxter" },
+  { name: "Ari Kama" },
+  { name: "Kenichi Suzuki" },
+  { name: "Rick Olson" },
+];
+
+/**
+ * class used to auto search from the list given an input
+ */
+class AutoCompleteSearchHelper {
+  constructor(list) {
+    this.list = list;
+  }
+
   /**
    * matches input text with name list
    * @param {String} input
-   * @returns {Array} list of matched names
+   * @returns {Array} list of matched items
    */
-  searchNames(input) {
+  search(input) {
     if (input === "") {
       return [];
     }
-    return this.names.filter((term) => term.name.toLowerCase().includes(input.toLowerCase()));
-  },
-};
+    return this.list.filter((term) => term.name.toLowerCase().includes(input.toLowerCase()));
+  }
 
-class AutoCompleteElement {
-  constructor(inputElement, autoResultElement) {
+  static getHelper(list) {
+    return new AutoCompleteSearchHelper(list);
+  }
+}
+
+class AutoComplete {
+  constructor({
+    inputElement, autoResultWrapperElement, unorderedList, sampleListItem, searchHelper,
+  }) {
     this.inputElement = inputElement;
-    this.autoResultElement = autoResultElement;
+    this.autoResultWrapperElement = autoResultWrapperElement;
+    this.unorderedList = unorderedList;
+    this.sampleListItem = sampleListItem;
+    this.searchHelper = searchHelper;
   }
 
   /**
    * shows option list
    */
   showOptionList() {
-    if (!this.autoResultElement.classList.contains("show")) {
-      this.autoResultElement.classList.add("show");
+    if (!this.autoResultWrapperElement.classList.contains("show")) {
+      this.autoResultWrapperElement.classList.add("show");
     }
   }
 
@@ -55,8 +72,8 @@ class AutoCompleteElement {
    * hides option list
    */
   hideOptionList() {
-    if (this.autoResultElement.classList.contains("show")) {
-      this.autoResultElement.classList.remove("show");
+    if (this.autoResultWrapperElement.classList.contains("show")) {
+      this.autoResultWrapperElement.classList.remove("show");
     }
   }
 
@@ -66,7 +83,7 @@ class AutoCompleteElement {
    */
   handleOptionClick(event) {
     const option = event.target;
-    this.inputElement.value = option.innerHTML;
+    this.inputElement.value = option.dataset.value;
     this.hideOptionList();
   }
 
@@ -77,18 +94,16 @@ class AutoCompleteElement {
   showResults(event) {
     const inputElement = event.target;
     const input = inputElement.value;
-    const matchedNames = autoCompleteSearchHelper.searchNames(input);
+    const matchedNames = this.searchHelper.search(input);
 
-    const ul = document.createElement("ul");
+    this.unorderedList.innerHTML = "";
     matchedNames.forEach((match) => {
-      const li = document.createElement("li");
-      li.appendChild(document.createTextNode(match.name));
-      li.addEventListener("click", this.handleOptionClick);
-      ul.appendChild(li);
+      const li = this.sampleListItem.cloneNode(true);
+      li.innerHTML = match.name;
+      li.setAttribute("data-value", match.name);
+      li.addEventListener("click", this.handleOptionClick.bind(this));
+      this.unorderedList.appendChild(li);
     });
-
-    this.autoResultElement.innerHTML = "";
-    this.autoResultElement.appendChild(ul);
 
     if (matchedNames.length > 0) {
       this.showOptionList();
@@ -97,10 +112,37 @@ class AutoCompleteElement {
     }
   }
 
-  registerInputClickListener() {
+  init() {
+    this.unorderedList.removeChild(this.sampleListItem);
     this.inputElement.addEventListener("input", this.showResults.bind(this));
+  }
+
+  /**
+   * creates AutoComplete initializes it and returns the instance
+   * @param {object}
+   * @returns {AutoComplete}
+   */
+  static create({
+    inputElement, autoResultWrapperElement, unorderedList, sampleListItem, searchHelper,
+  }) {
+    const autoComplete = new AutoComplete({
+      inputElement, autoResultWrapperElement, unorderedList, sampleListItem, searchHelper,
+    });
+    autoComplete.init();
+    return autoComplete;
   }
 }
 
-const autoCompleteElement = new AutoCompleteElement(document.getElementById("inputName"), document.getElementById("autoResult"));
-autoCompleteElement.registerInputClickListener();
+function createAutoComplete() {
+  const inputElement = document.querySelector("[data-input='name']");
+  const autoResultWrapperElement = document.querySelector("[data-autoResult='outerAutoResult']");
+  const unorderedList = autoResultWrapperElement.querySelector("[data-autoResult='innerAutoResult']");
+  const sampleListItem = unorderedList.querySelector("[data-name='sample']");
+  const searchHelper = AutoCompleteSearchHelper.getHelper(names);
+
+  AutoComplete.create({
+    inputElement, autoResultWrapperElement, unorderedList, sampleListItem, searchHelper,
+  });
+}
+
+window.addEventListener("load", createAutoComplete);
