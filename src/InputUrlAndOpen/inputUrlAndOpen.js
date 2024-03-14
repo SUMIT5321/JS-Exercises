@@ -1,6 +1,8 @@
 /* eslint-disable no-alert */
 
 class UrlHandler {
+  static urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
+
   constructor(url) {
     this.url = url;
   }
@@ -30,8 +32,7 @@ class UrlHandler {
    * @returns {Boolean}
    */
   #validateUrl() {
-    const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
-    return urlPattern.test(this.url);
+    return UrlHandler.urlPattern.test(this.url);
   }
 
   #validateAndOpen() {
@@ -43,7 +44,7 @@ class UrlHandler {
   }
 
   /**
-   * show prompt to user and returns UrlHandler
+   * show prompt to user and open the entered url
    */
   static takeUrlAndOpen() {
     const url = prompt("Enter a URL:");
@@ -52,4 +53,4 @@ class UrlHandler {
   }
 }
 
-window.addEventListener("load", UrlHandler.takeUrlAndOpen.bind(UrlHandler));
+window.addEventListener("load", UrlHandler.takeUrlAndOpen);
