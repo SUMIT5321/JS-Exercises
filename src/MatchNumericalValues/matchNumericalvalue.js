@@ -1,4 +1,8 @@
 class LoaderButton {
+  /**
+   * the button element must contain 2 child element - text and loader
+   * @param {HTMLButtonElement} buttonElement
+   */
   constructor(buttonElement) {
     this.buttonElement = buttonElement;
     this.textElement = buttonElement.firstElementChild;
@@ -74,6 +78,7 @@ class NumberValidationForm {
   /**
    * creates {NumberValidationForm} and returns an instance of it
    * @param {HTMLFormElement} form
+   * @param {HTMLButtonElement} button
    * @returns {NumberValidationForm}
    */
   static create(form, button) {
