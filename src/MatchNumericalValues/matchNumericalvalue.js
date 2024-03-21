@@ -1,5 +1,5 @@
 class NumberValidationForm {
-  static numericalRegex = /^\d+$/;
+  static numberRegex = /^\d+$/;
 
   constructor({ form, numberInputElement, resultElement }) {
     this.form = form;
@@ -19,7 +19,7 @@ class NumberValidationForm {
    * @returns {Boolean}
    */
   validateInput() {
-    return NumberValidationForm.numericalRegex.test(this.numberInputElement.value);
+    return NumberValidationForm.numberRegex.test(this.numberInputElement.value);
   }
 
   /**
