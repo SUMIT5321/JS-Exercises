@@ -2,6 +2,7 @@
     <head>
         <title>Match Numerical Values</title>
         <link rel="stylesheet" href="matchNumericalValue.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     <body>
         <div class="container">
@@ -19,7 +20,10 @@
                 </div>
 
                 <div style="display: flex; justify-content: center;">
-                  <button id="buttonSubmit" class="button" type="submit">SUBMIT</button>
+                  <button id="buttonSubmit" class="button" type="submit" data-button="submitButton">
+                    <span id="btnSubmitText">SUBMIT</span>
+                    <i class="fa fa-spinner fa-spin"></i> 
+                  </button>
                 </div>
               </form>
             </div>
