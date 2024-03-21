@@ -1,28 +1,55 @@
-const form = document.forms[0];
-const numberInputElement = form.elements[0];
-const resultElement = form.elements[1];
+class NumberValidationForm {
+  static numericalRegex = /^\d+$/;
 
-class UserInputNumber {
-  constructor(numberInput) {
-    this.number = numberInput;
+  constructor({ form, numberInputElement, resultElement }) {
+    this.form = form;
+    this.numberInputElement = numberInputElement;
+    this.resultElement = resultElement;
   }
 
+  /**
+   * adds event handlers
+   */
+  init() {
+    this.form.addEventListener("submit", this.handleFormSubmit.bind(this));
+  }
+
+  /**
+   * Checks if input text is a valid number
+   * @returns {Boolean}
+   */
   validateInput() {
-    const numericalRegex = /^\d+$/;
-    return numericalRegex.test(this.number);
+    return NumberValidationForm.numericalRegex.test(this.numberInputElement.value);
+  }
+
+  /**
+   * overrides default submit behaviour
+   * @param {Event} event
+   */
+  handleFormSubmit(event) {
+    event.preventDefault();
+    if (this.validateInput()) {
+      this.resultElement.value = "true";
+      setTimeout(() => this.form.reset(), 1000); // simulate form submit
+    } else {
+      this.resultElement.value = "false";
+    }
+  }
+
+  /**
+   * creates {NumberValidationForm} and returns an instance of it
+   * @param {HTMLFormElement} form
+   * @returns {NumberValidationForm}
+   */
+  static create(form) {
+    const numberInputElement = form.elements[0];
+    const resultElement = form.elements[1];
+    const numberValidationForm = new NumberValidationForm(
+      { form, numberInputElement, resultElement },
+    );
+    numberValidationForm.init();
+    return numberValidationForm;
   }
 }
 
-function handleSubmit() {
-  const userInput = new UserInputNumber(numberInputElement.value);
-
-  if (userInput.validateInput()) {
-    resultElement.value = "true";
-    // submit after half a second so that user sees that the value turned true
-    setTimeout(() => form.submit(), 500);
-  } else {
-    resultElement.value = "false";
-  }
-}
-
-document.getElementById("buttonSubmit").addEventListener("click", handleSubmit);
+window.addEventListener("load", () => NumberValidationForm.create(document.forms[0]));
