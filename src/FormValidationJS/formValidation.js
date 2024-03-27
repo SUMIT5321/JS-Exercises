@@ -9,7 +9,7 @@ const validator = {
   validateTextLength(...[fieldName, value, minLength]) {
     return value && value.trim().length >= minLength ? null : `Enter atleast ${minLength} characters in ${fieldName}`;
   },
-  validateIsEmpty(...[fieldName, value]) {
+  validateIsNotEmpty(...[fieldName, value]) {
     return (this.validateTextLength(fieldName, value, 1) === null) ? null : `${fieldName} can't be empty.`;
   },
   validateEmail(...[, value]) {
@@ -73,20 +73,22 @@ class UserForm {
     const errorMsgs = [];
     function validateField(validatorFunction, ...args) {
       const errorMessage = validatorFunction.bind(validator)(...args);
-      if (errorMessage != null) errorMsgs.push(errorMessage);
+      if (errorMessage != null) {
+        errorMsgs.push(errorMessage);
+        return false;
+      }
+      return true;
     }
 
     const {
       userId, email, name, timeZone, homePage, aboutMe, receiveCommentsNotification,
     } = this.fieldValues;
 
-    validateField(validator.validateIsEmpty, "Login Id", userId);
-    validateField(validator.validateIsEmpty, "Email", email);
-    validateField(validator.validateEmail, "Email", email);
-    validateField(validator.validateIsEmpty, "Name", name);
-    validateField(validator.validateIsEmpty, "timeZone", timeZone);
-    validateField(validator.validateIsEmpty, "Home page", homePage);
-    validateField(validator.validateUrl, "Home page", homePage);
+    validateField(validator.validateIsNotEmpty, "Login Id", userId);
+    if (validateField(validator.validateIsNotEmpty, "Email", email)) validateField(validator.validateEmail, "Email", email);
+    validateField(validator.validateIsNotEmpty, "Name", name);
+    validateField(validator.validateIsNotEmpty, "timeZone", timeZone);
+    if (validateField(validator.validateIsNotEmpty, "Home page", homePage)) validateField(validator.validateUrl, "Home page", homePage);
     validateField(validator.validateTextLength, "About me", aboutMe, 50);
     if (!receiveCommentsNotification) errorMsgs.push("Please check receive comment notifications");
 
