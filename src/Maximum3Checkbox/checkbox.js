@@ -1,6 +1,7 @@
 /* eslint-disable no-alert */
-class FormClickHandler {
-  constructor(daysCheckboxes, noneCheckbox) {
+class DaysMultiSelect {
+  constructor({ maxAllowedSelection, daysCheckboxes, noneCheckbox }) {
+    this.maxAllowedSelection = maxAllowedSelection;
     this.daysCheckboxes = daysCheckboxes;
     this.noneCheckbox = noneCheckbox;
     this.selectedDays = [];
@@ -8,23 +9,23 @@ class FormClickHandler {
 
   handleNoneCheckUncheck() {
     if (this.noneCheckbox.checked === true) {
-      this.selectedDays.splice(0, this.selectedDays.length);
-      this.daysCheckboxes.forEach((element) => {
-      // eslint-disable-next-line no-param-reassign
-        element.checked = false;
-      });
+      this.selectedDays = [];
+      Array.prototype.filter.call(this.daysCheckboxes, (e) => e.checked)
+        .forEach((element) => {
+          // eslint-disable-next-line no-param-reassign
+          element.checked = false;
+        });
     }
   }
 
   /**
-   *
    * @param {EventTarget} view
    */
   handleDaysCheckUncheck(view) {
     if (view.checked === true) {
-      if (this.selectedDays.length === 3) {
+      if (this.selectedDays.length === this.maxAllowedSelection) {
         view.checked = false;
-        alert(`Only 3 days can be selected. You have already selected ${this.selectedDays[0]}, ${this.selectedDays[1]} and ${this.selectedDays[2]}`);
+        alert(`Only ${this.maxAllowedSelection} days can be selected. You have already selected ${this.selectedDays[0]}, ${this.selectedDays[1]} and ${this.selectedDays[2]}`);
       } else {
         this.noneCheckbox.checked = false;
         this.selectedDays.push(view.value);
@@ -35,23 +36,30 @@ class FormClickHandler {
     }
   }
 
-  /**
-  * @param {MouseEvent} event
-  */
-  handleFormClick(event) {
-    const view = event.target;
+  init() {
+    this.daysCheckboxes.forEach((v) => {
+      v.addEventListener("click", () => this.handleDaysCheckUncheck(v));
+    });
+    this.noneCheckbox.addEventListener("click", () => this.handleNoneCheckUncheck());
+  }
 
-    if (view.type !== "checkbox") {
-      return;
-    }
+  static create({ maxAllowedSelection, daysCheckboxes, noneCheckbox }) {
+    // allow number >= 2 and <=7
+    const cleanedMaxAllowedSelection = Math.max(2, Math.min(7, maxAllowedSelection));
 
-    if (view.value === "None") { // none checked/unchecked
-      this.handleNoneCheckUncheck();
-    } else { // days checked / unchecked
-      this.handleDaysCheckUncheck(view);
-    }
+    const daysMultiSelect = new DaysMultiSelect({
+      maxAllowedSelection: cleanedMaxAllowedSelection,
+      daysCheckboxes,
+      noneCheckbox,
+    });
+    daysMultiSelect.init();
   }
 }
 
-const formClickHandler = new FormClickHandler(document.getElementsByName("days"), document.getElementsByName("days-none")[0]);
-document.forms[0].addEventListener("click", formClickHandler.handleFormClick.bind(formClickHandler));
+window.addEventListener("load", () => {
+  const daysCheckboxes = document.querySelectorAll("input[data-day]:not([data-day='none'])");
+  const noneCheckbox = document.querySelector("[data-day='none']");
+  const maxAllowedSelection = 3;
+
+  DaysMultiSelect.create({ maxAllowedSelection, daysCheckboxes, noneCheckbox });
+});
