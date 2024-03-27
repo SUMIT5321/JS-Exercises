@@ -4,56 +4,33 @@ function showAlert(msg) {
 }
 
 const validator = {
-  validateTextLength: (text, minLength = 1) => text && text.trim().length >= minLength,
-  validateEmail: (email) => {
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-    return emailPattern.test(email);
+  emailPattern: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+  urlPattern: /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/,
+  validateTextLength(...[fieldName, value, minLength]) {
+    return value && value.trim().length >= minLength ? null : `Enter atleast ${minLength} characters in ${fieldName}`;
   },
-  validateUrl: (url) => {
-    const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
-    return urlPattern.test(url);
+  validateIsNotEmpty(...[fieldName, value]) {
+    return (this.validateTextLength(fieldName, value, 1) === null) ? null : `${fieldName} can't be empty.`;
+  },
+  validateEmail(...[, value]) {
+    return this.emailPattern.test(value) ? null : "Enter a valid email";
+  },
+  validateUrl(...[fieldName, value]) {
+    return this.urlPattern.test(value) ? null : `Enter a valid ${fieldName} URL`;
   },
 };
 
-class User {
-  constructor({
-    userId, email, name, timeZone, homePage, aboutMe, receiveCommentsNotification,
-  }) {
-    this.id = userId;
-    this.email = email;
-    this.name = name;
-    this.timeZone = timeZone;
-    this.homePage = homePage;
-    this.aboutMe = aboutMe;
-    this.receiveCommentsNotification = receiveCommentsNotification;
+class UserForm {
+  constructor(form) {
+    this.form = form;
+    this.fieldValues = {};
   }
-
-  /**
-   * @returns {Array} an array of error messages
-   */
-  validate() {
-    const errorMsgs = [];
-    if (!validator.validateTextLength(this.id)) errorMsgs.push("Login Id can't be empty."); // validate id
-    if (!validator.validateTextLength(this.email)) errorMsgs.push("Email can't be empty."); // validate email
-    else if (!validator.validateEmail(this.email)) errorMsgs.push("Enter a valid email");
-    if (!validator.validateTextLength(this.name)) errorMsgs.push("Name can't be empty."); // validate name
-    if (!validator.validateTextLength(this.homePage)) errorMsgs.push("Home page can't be empty."); // validate home page
-    else if (!validator.validateUrl(this.homePage)) errorMsgs.push("Enter a valid Home page URL");
-    if (!validator.validateTextLength(this.aboutMe, 50)) errorMsgs.push("Enter atleast 50 characters about yourself."); // validate about me
-    if (!this.receiveCommentsNotification) errorMsgs.push("Please check receive comment notifications"); // validate receive notification
-
-    return errorMsgs;
-  }
-}
-
-const userFormHandler = {
-  form: document.forms[0],
 
   /**
    * extracts form data and returns an object
    * @returns {{userId, email, name, timeZone, homePage, aboutMe, receiveCommentsNotification}}
    */
-  exteactFormData() {
+  extractFormData() {
     const formElements = this.form.elements;
     const formLength = formElements.length;
     const formData = {};
@@ -87,19 +64,70 @@ const userFormHandler = {
       }
     }
     return formData;
-  },
-  handleSubmit() {
-    const formData = this.exteactFormData();
-    const user = new User(formData);
+  }
 
-    const formErrors = user.validate();
+  /**
+   * @returns {Array} an array of error messages
+   */
+  validate() {
+    const errorMsgs = [];
+    function validateField(validatorFunction, ...args) {
+      const errorMessage = validatorFunction.bind(validator)(...args);
+      if (errorMessage != null) {
+        errorMsgs.push(errorMessage);
+        return false;
+      }
+      return true;
+    }
+
+    const {
+      userId, email, name, timeZone, homePage, aboutMe, receiveCommentsNotification,
+    } = this.fieldValues;
+
+    validateField(validator.validateIsNotEmpty, "Login Id", userId);
+    if (validateField(validator.validateIsNotEmpty, "Email", email)) validateField(validator.validateEmail, "Email", email);
+    validateField(validator.validateIsNotEmpty, "Name", name);
+    validateField(validator.validateIsNotEmpty, "timeZone", timeZone);
+    if (validateField(validator.validateIsNotEmpty, "Home page", homePage)) validateField(validator.validateUrl, "Home page", homePage);
+    validateField(validator.validateTextLength, "About me", aboutMe, 50);
+    if (!receiveCommentsNotification) errorMsgs.push("Please check receive comment notifications");
+
+    return errorMsgs;
+  }
+
+  /**
+   * @param {MouseEvent} event
+   */
+  handleSubmit(event) {
+    this.fieldValues = this.extractFormData();
+    const formErrors = this.validate();
     if (formErrors.length === 0) {
       this.form.submit();
       showAlert("Thanks. Received your details.");
     } else {
+      event.preventDefault(); // prevent form submission
       formErrors.forEach((error) => showAlert(error));
     }
-  },
-};
+    this.fieldValues = {}; // refresh field values
+  }
 
-document.getElementById("buttonGo").addEventListener("click", userFormHandler.handleSubmit.bind(userFormHandler));
+  /**
+   * method to do any initializations - like add events
+   */
+  init() {
+    this.form.addEventListener("submit", (e) => this.handleSubmit(e));
+  }
+
+  /**
+   * static method to create {UserForm}
+   * @param {HTMLFormElement} form
+   * @returns {UserForm}
+   */
+  static createUserForm(form) {
+    const userForm = new UserForm(form);
+    userForm.init();
+    return userForm;
+  }
+}
+
+window.addEventListener("load", () => UserForm.createUserForm(document.forms[0]));
