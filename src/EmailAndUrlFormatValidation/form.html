@@ -10,22 +10,22 @@
               <form>
                 <div class="formRow">
                   <div class="label">Login Id</div>
-                  <input class="inputText" data-inputfield="loginId" type="text" required>
+                  <input class="inputText" data-inputfield="loginId" type="text">
                 </div>
 
                 <div class="formRow">
                   <div class="label">Email</div>
-                  <input class="inputText" data-inputfield="email" type="email" required>
+                  <input class="inputText" data-inputfield="email" type="text">
                 </div>
 
                 <div class="formRow">
                   <div class="label">Name</div>
-                  <input class="inputText" data-inputfield="name" type="text" required>
+                  <input class="inputText" data-inputfield="name" type="text">
                 </div>
 
                 <div class="formRow">
                   <div class="label">TimeZone</div>
-                  <select class="dropdown" data-inputfield="timeZone" required>
+                  <select class="dropdown" data-inputfield="timeZone">
                     <option value="gmt">GMT</option>
                     <option value="ist">IST</option>
                     <option value="est">EST</option>
@@ -35,14 +35,14 @@
 
                 <div class="formRow">
                   <div class="label">Home Page</div>
-                  <input class="inputText" data-inputfield="homePage" type="text" required>
+                  <input class="inputText" data-inputfield="homePage" type="text">
                 </div>
                 
                 <div class="label topMargin16">About Me</div>
-                <textarea class="about" data-inputfield="aboutMe" minLength="50" required></textarea>
+                <textarea class="about" data-inputfield="aboutMe"></textarea>
 
                 <div class="checkbox">
-                  <input type="checkbox" data-inputfield="receiveNotification" required/>
+                  <input id="cbReceiveNotification" type="checkbox" data-inputfield="receiveNotification"/>
                   <label for="cbReceiveNotification">Receive notification of comments.</label><br>
                 </div>
                 <div class="note">
@@ -52,7 +52,7 @@
                 <div class="passwordMessage">Your password will be mailed to you.</div>
 
                 <div class="centerContent">
-                  <div id="buttonGo" class="button">GO</div>
+                  <button type="submit" id="buttonGo" class="button">GO</button>
                 </div>
               </form>
             </div>
