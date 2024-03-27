@@ -1,38 +1,65 @@
 /* eslint-disable no-alert */
-const form = document.forms[0];
-const urlInputField = form.elements[0];
+/**
+ * wapper on {HTMLInputElement}, provides an functionality to validate
+ * and parse the entered url to return domain and subdomain
+ */
+class UrlInputBox {
+  static domainSubdomainRegex = /^(?:https?:\/\/)?(?:www\.)?(?:([^:/\n]+)\.)?([^:/\n]+\.[^:/\n?#]+)$/;
 
-class UrlProcessor {
-  constructor(url) {
-    this.url = url;
+  constructor(inputFiled) {
+    this.inputFiled = inputFiled;
   }
 
-  getDomainAndSubdomain() {
-    const domainSubdomainRegex = /^(?:https?:\/\/)?(?:www\.)?(?:([^:/\n]+)\.)?([^:/\n]+\.[^:/\n?#]+)$/;
-    const matches = domainSubdomainRegex.exec(this.url);
+  parseDomainAndSubdomain() {
+    const matches = UrlInputBox.domainSubdomainRegex.exec(this.inputFiled.value);
 
     return matches ? {
       subdoamin: matches[1],
       domain: matches[2],
     } : null;
   }
-}
 
-function handleSubmit() {
-  const urlProcessor = new UrlProcessor(urlInputField.value);
-
-  const domainSubdoamin = urlProcessor.getDomainAndSubdomain();
-  if (domainSubdoamin) {
-    let msg = `Domain: ${domainSubdoamin.domain}`;
-    if (domainSubdoamin.subdoamin) {
-      msg += `, Subdomain: ${domainSubdoamin.subdoamin}.`;
-    } else {
-      msg += ".";
-    }
-    alert(msg);
-  } else {
-    alert("Not a valid url");
+  static create(inputfield) {
+    return new UrlInputBox(inputfield);
   }
 }
 
-document.getElementById("buttonSubmit").addEventListener("click", handleSubmit);
+class CustomForm {
+  constructor(form) {
+    this.form = form;
+  }
+
+  init() {
+    const urlField = this.form.querySelector("[data-type]");
+    this.urlField = UrlInputBox.create(urlField);
+
+    this.form.addEventListener("submit", (e) => this.handleFormSubmit(e));
+  }
+
+  handleFormSubmit(event) {
+    event.preventDefault();
+    const domainSubdoamin = this.urlField.parseDomainAndSubdomain();
+    CustomForm.showDomainSubdoamin(domainSubdoamin);
+  }
+
+  static showDomainSubdoamin(domainSubdoamin) {
+    if (domainSubdoamin) {
+      let msg = `Domain: ${domainSubdoamin.domain}`;
+      if (domainSubdoamin.subdoamin) {
+        msg += `, Subdomain: ${domainSubdoamin.subdoamin}.`;
+      } else {
+        msg += ".";
+      }
+      alert(msg);
+    } else {
+      alert("Not a valid url");
+    }
+  }
+
+  static create(form) {
+    const customForm = new CustomForm(form);
+    customForm.init();
+  }
+}
+
+window.addEventListener("load", () => CustomForm.create(document.forms[0]));
