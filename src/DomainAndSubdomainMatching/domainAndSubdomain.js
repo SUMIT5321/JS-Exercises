@@ -30,7 +30,7 @@ class CustomForm {
   }
 
   init() {
-    const urlField = this.form.querySelector("[data-type]");
+    const urlField = this.form.querySelector("[data-type='url']");
     this.urlField = UrlInputBox.create(urlField);
 
     this.form.addEventListener("submit", (e) => this.handleFormSubmit(e));
@@ -38,6 +38,10 @@ class CustomForm {
 
   handleFormSubmit(event) {
     event.preventDefault();
+    if (this.urlField.inputFiled.value === "") {
+      alert("Please enter a URL");
+      return;
+    }
     const domainSubdoamin = this.urlField.parseDomainAndSubdomain();
     CustomForm.showDomainSubdoamin(domainSubdoamin);
   }
