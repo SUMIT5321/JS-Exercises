@@ -3,20 +3,32 @@ function showAlert(msg) {
   alert(msg);
 }
 
+const errorMessages = {
+  emptyField: "%s can't be empty.",
+  minLength: "Enter atleast %s characters in %s",
+  invalidEmail: "Enter a valid email",
+  invalidUrl: "Enter a valid %s URL",
+  checkReceiveNotification: "Please check receive comment notifications",
+};
+
+function formatText(text, ...args) {
+  return args.reduce((prevVal, currentVal) => prevVal.replace(/%s/, currentVal), text);
+}
+
 const validator = {
   emailPattern: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
   urlPattern: /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/,
-  validateTextLength(...[fieldName, value, minLength]) {
-    return value && value.trim().length >= minLength ? null : `Enter atleast ${minLength} characters in ${fieldName}`;
+  validateTextLength(...[value, minLength]) {
+    return value && value.trim().length >= minLength;
   },
-  validateIsNotEmpty(...[fieldName, value]) {
-    return (this.validateTextLength(fieldName, value, 1) === null) ? null : `${fieldName} can't be empty.`;
+  validateIsNotEmpty(...[value]) {
+    return this.validateTextLength(value, 1);
   },
-  validateEmail(...[, value]) {
-    return this.emailPattern.test(value) ? null : "Enter a valid email";
+  validateEmail(...[value]) {
+    return this.emailPattern.test(value);
   },
-  validateUrl(...[fieldName, value]) {
-    return this.urlPattern.test(value) ? null : `Enter a valid ${fieldName} URL`;
+  validateUrl(...[value]) {
+    return this.urlPattern.test(value);
   },
 };
 
@@ -28,7 +40,7 @@ class UserForm {
 
   /**
    * extracts form data and returns an object
-   * @returns {{userId, email, name, timeZone, homePage, aboutMe, receiveCommentsNotification}}
+   * @returns {{loginId, email, name, timeZone, homePage, aboutMe, receiveNotification}}
    */
   extractFormData() {
     const formElements = this.form.elements;
@@ -37,76 +49,23 @@ class UserForm {
 
     for (let i = 0; i < formLength; i += 1) {
       const element = formElements[i];
-      switch (element.dataset.inputfield) {
-        case "loginId":
-          formData.userId = element.value;
-          break;
-        case "email":
-          formData.email = element.value;
-          break;
-        case "name":
-          formData.name = element.value;
-          break;
-        case "timeZone":
-          formData.timeZone = element.value;
-          break;
-        case "homePage":
-          formData.homePage = element.value;
-          break;
-        case "aboutMe":
-          formData.aboutMe = element.value;
-          break;
-        case "receiveNotification":
-          formData.receiveCommentsNotification = element.checked;
-          break;
-        default:
-          break;
-      }
+      if (element.dataset.inputfield) formData[element.dataset.inputfield] = element.value;
+      if (element.dataset.checkbox) formData[element.dataset.checkbox] = element.checked;
     }
     return formData;
-  }
-
-  /**
-   * @returns {Array} an array of error messages
-   */
-  validate() {
-    const errorMsgs = [];
-    function validateField(validatorFunction, ...args) {
-      const errorMessage = validatorFunction.bind(validator)(...args);
-      if (errorMessage != null) {
-        errorMsgs.push(errorMessage);
-        return false;
-      }
-      return true;
-    }
-
-    const {
-      userId, email, name, timeZone, homePage, aboutMe, receiveCommentsNotification,
-    } = this.fieldValues;
-
-    validateField(validator.validateIsNotEmpty, "Login Id", userId);
-    if (validateField(validator.validateIsNotEmpty, "Email", email)) validateField(validator.validateEmail, "Email", email);
-    validateField(validator.validateIsNotEmpty, "Name", name);
-    validateField(validator.validateIsNotEmpty, "timeZone", timeZone);
-    if (validateField(validator.validateIsNotEmpty, "Home page", homePage)) validateField(validator.validateUrl, "Home page", homePage);
-    validateField(validator.validateTextLength, "About me", aboutMe, 50);
-    if (!receiveCommentsNotification) errorMsgs.push("Please check receive comment notifications");
-
-    return errorMsgs;
   }
 
   /**
    * @param {MouseEvent} event
    */
   handleSubmit(event) {
-    this.fieldValues = this.extractFormData();
-    const formErrors = this.validate();
-    if (formErrors.length === 0) {
-      this.form.submit();
-      showAlert("Thanks. Received your details.");
-    } else {
+    const fieldValues = this.extractFormData();
+    const formErrors = UserForm.validate(fieldValues);
+    if (formErrors.length) {
       event.preventDefault(); // prevent form submission
       formErrors.forEach((error) => showAlert(error));
+    } else {
+      showAlert("Thanks. Received your details.");
     }
     this.fieldValues = {}; // refresh field values
   }
@@ -128,6 +87,36 @@ class UserForm {
     userForm.init();
     return userForm;
   }
+
+  /**
+   * @returns {Array} an array of error messages
+   */
+  static validate(fieldValues) {
+    const errorMsgs = [];
+    function checkForEmptyField(label, value) {
+      if (!validator.validateIsNotEmpty(value)) {
+        errorMsgs.push(formatText(errorMessages.emptyField, label));
+        return true;
+      }
+      return false;
+    }
+
+    checkForEmptyField("Login Id", fieldValues.loginId);
+    if (!checkForEmptyField("Email", fieldValues.email) && !validator.validateEmail(fieldValues.email)) {
+      errorMsgs.push(formatText(errorMessages.invalidEmail, "Email"));
+    }
+    checkForEmptyField("Name", fieldValues.name);
+    checkForEmptyField("Time zone", fieldValues.timeZone);
+    if (!checkForEmptyField("Home page", fieldValues.homePage) && !validator.validateUrl(fieldValues.homePage)) {
+      errorMsgs.push(formatText(errorMessages.invalidUrl, "Home page"));
+    }
+    if (!validator.validateTextLength(fieldValues.aboutMe, 50)) {
+      errorMsgs.push(formatText(errorMessages.minLength, 50, "About me"));
+    }
+    if (!fieldValues.receiveNotification) errorMsgs.push(errorMessages.checkReceiveNotification);
+
+    return errorMsgs;
+  }
 }
 
-window.addEventListener("load", () => UserForm.createUserForm(document.forms[0]));
+window.addEventListener("load", () => UserForm.createUserForm(document.querySelector("[data-form='userForm']")));
