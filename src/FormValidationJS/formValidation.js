@@ -28,7 +28,7 @@ class UserForm {
 
   /**
    * extracts form data and returns an object
-   * @returns {{userId, email, name, timeZone, homePage, aboutMe, receiveCommentsNotification}}
+   * @returns {{loginId, email, name, timeZone, homePage, aboutMe, receiveNotification}}
    */
   extractFormData() {
     const formElements = this.form.elements;
@@ -37,76 +37,24 @@ class UserForm {
 
     for (let i = 0; i < formLength; i += 1) {
       const element = formElements[i];
-      switch (element.dataset.inputfield) {
-        case "loginId":
-          formData.userId = element.value;
-          break;
-        case "email":
-          formData.email = element.value;
-          break;
-        case "name":
-          formData.name = element.value;
-          break;
-        case "timeZone":
-          formData.timeZone = element.value;
-          break;
-        case "homePage":
-          formData.homePage = element.value;
-          break;
-        case "aboutMe":
-          formData.aboutMe = element.value;
-          break;
-        case "receiveNotification":
-          formData.receiveCommentsNotification = element.checked;
-          break;
-        default:
-          break;
-      }
+      if (element.dataset.inputfield) formData[element.dataset.inputfield] = element.value;
+      if (element.dataset.checkbox) formData[element.dataset.checkbox] = element.checked;
     }
     return formData;
-  }
-
-  /**
-   * @returns {Array} an array of error messages
-   */
-  validate() {
-    const errorMsgs = [];
-    function validateField(validatorFunction, ...args) {
-      const errorMessage = validatorFunction.bind(validator)(...args);
-      if (errorMessage != null) {
-        errorMsgs.push(errorMessage);
-        return false;
-      }
-      return true;
-    }
-
-    const {
-      userId, email, name, timeZone, homePage, aboutMe, receiveCommentsNotification,
-    } = this.fieldValues;
-
-    validateField(validator.validateIsNotEmpty, "Login Id", userId);
-    if (validateField(validator.validateIsNotEmpty, "Email", email)) validateField(validator.validateEmail, "Email", email);
-    validateField(validator.validateIsNotEmpty, "Name", name);
-    validateField(validator.validateIsNotEmpty, "timeZone", timeZone);
-    if (validateField(validator.validateIsNotEmpty, "Home page", homePage)) validateField(validator.validateUrl, "Home page", homePage);
-    validateField(validator.validateTextLength, "About me", aboutMe, 50);
-    if (!receiveCommentsNotification) errorMsgs.push("Please check receive comment notifications");
-
-    return errorMsgs;
   }
 
   /**
    * @param {MouseEvent} event
    */
   handleSubmit(event) {
-    this.fieldValues = this.extractFormData();
-    const formErrors = this.validate();
-    if (formErrors.length === 0) {
-      this.form.submit();
-      showAlert("Thanks. Received your details.");
-    } else {
+    event.preventDefault();
+    const fieldValues = this.extractFormData();
+    const formErrors = UserForm.validate(fieldValues);
+    if (formErrors.length) {
       event.preventDefault(); // prevent form submission
       formErrors.forEach((error) => showAlert(error));
+    } else {
+      showAlert("Thanks. Received your details.");
     }
     this.fieldValues = {}; // refresh field values
   }
@@ -127,6 +75,31 @@ class UserForm {
     const userForm = new UserForm(form);
     userForm.init();
     return userForm;
+  }
+
+  /**
+   * @returns {Array} an array of error messages
+   */
+  static validate(fieldValues) {
+    const errorMsgs = [];
+    function validateField(validatorFunction, ...args) {
+      const errorMessage = validatorFunction.bind(validator)(...args);
+      if (errorMessage != null) {
+        errorMsgs.push(errorMessage);
+        return false;
+      }
+      return true;
+    }
+
+    validateField(validator.validateIsNotEmpty, "Login Id", fieldValues.loginId);
+    if (validateField(validator.validateIsNotEmpty, "Email", fieldValues.email)) validateField(validator.validateEmail, "Email", fieldValues.email);
+    validateField(validator.validateIsNotEmpty, "Name", fieldValues.name);
+    validateField(validator.validateIsNotEmpty, "timeZone", fieldValues.timeZone);
+    if (validateField(validator.validateIsNotEmpty, "Home page", fieldValues.homePage)) validateField(validator.validateUrl, "Home page", fieldValues.homePage);
+    validateField(validator.validateTextLength, "About me", fieldValues.aboutMe, 50);
+    if (!fieldValues.receiveNotification) errorMsgs.push("Please check receive comment notifications");
+
+    return errorMsgs;
   }
 }
 
