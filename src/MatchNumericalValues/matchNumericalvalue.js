@@ -3,50 +3,45 @@ class LoaderButton {
    * the button element must contain 2 child element - text and loader
    * @param {HTMLButtonElement} buttonElement
    */
-  constructor(buttonElement) {
-    this.buttonElement = buttonElement;
-    this.textElement = buttonElement.firstElementChild;
-    this.loaderElement = buttonElement.lastElementChild;
+  constructor(buttonId) {
+    this.buttonElement = document.querySelector(buttonId);
+    this.textElement = this.buttonElement.firstElementChild;
+    this.loaderElement = this.buttonElement.lastElementChild;
   }
 
   init() {
-    this.showLoader(false);
+    this.setLoadingState(false);
   }
 
-  showLoader(show) {
-    if (show) {
-      this.textElement.style.display = "none";
-      this.loaderElement.style.display = "block";
-    } else {
-      this.textElement.style.display = "block";
-      this.loaderElement.style.display = "none";
-    }
+  setLoadingState(showLoading) {
+    this.loaderElement.style.display = showLoading ? "block" : "none";
+    this.textElement.style.display = showLoading ? "none" : "block";
   }
 
-  static create(buttonElement) {
-    const loaderButton = new LoaderButton(buttonElement);
+  static create(buttonId) {
+    const loaderButton = new LoaderButton(buttonId);
     loaderButton.init();
     return loaderButton;
   }
 }
 
-class NumberValidationForm {
-  static numberRegex = /^\d+$/;
+class NumberValidator {
+  static NUMBER_REGEX = /^\d+$/;
 
   constructor({
-    form, numberInputElement, resultElement, loaderButton,
+    formId, inputElementId, resultElementId, buttonId,
   }) {
-    this.form = form;
-    this.numberInputElement = numberInputElement;
-    this.resultElement = resultElement;
-    this.loaderButton = loaderButton;
+    this.form = document.querySelector(formId);
+    this.numberInputElement = document.querySelector(inputElementId);
+    this.resultElement = document.querySelector(resultElementId);
+    this.loaderButton = LoaderButton.create(buttonId);
   }
 
   /**
    * do any init work, adds event handlers
    */
   init() {
-    this.form.addEventListener("submit", this.handleFormSubmit.bind(this));
+    this.form.addEventListener("submit", this.handleSubmit.bind(this));
   }
 
   /**
@@ -54,20 +49,20 @@ class NumberValidationForm {
    * @returns {Boolean}
    */
   validateInput() {
-    return NumberValidationForm.numberRegex.test(this.numberInputElement.value);
+    return NumberValidator.NUMBER_REGEX.test(this.numberInputElement.value);
   }
 
   /**
    * overrides default submit behaviour
    * @param {Event} event
    */
-  handleFormSubmit(event) {
+  handleSubmit(event) {
     event.preventDefault();
     if (this.validateInput()) {
-      this.loaderButton.showLoader(true);
+      this.loaderButton.setLoadingState(true);
       this.resultElement.value = "true";
       setTimeout(() => {
-        this.loaderButton.showLoader(false);
+        this.loaderButton.setLoadingState(false);
         this.form.reset();
       }, 1000); // simulate form submit
     } else {
@@ -79,15 +74,14 @@ class NumberValidationForm {
    * creates {NumberValidationForm} and returns an instance of it
    * @param {HTMLFormElement} form
    * @param {HTMLButtonElement} button
-   * @returns {NumberValidationForm}
+   * @returns {NumberValidator}
    */
-  static create(form, button) {
-    const numberInputElement = form.elements[0];
-    const resultElement = form.elements[1];
-    const loaderButton = LoaderButton.create(button);
-    const numberValidationForm = new NumberValidationForm(
+  static create({
+    formId, inputElementId, resultElementId, buttonId,
+  }) {
+    const numberValidationForm = new NumberValidator(
       {
-        form, numberInputElement, resultElement, loaderButton,
+        formId, inputElementId, resultElementId, buttonId,
       },
     );
     numberValidationForm.init();
@@ -95,4 +89,12 @@ class NumberValidationForm {
   }
 }
 
-window.addEventListener("load", () => NumberValidationForm.create(document.forms[0], document.querySelector("[data-button='submitButton']")));
+window.addEventListener("load", () => {
+  const numberValidatorArgs = {
+    formId: "[data-form='numberValidator']",
+    inputElementId: "[data-input='enterNumber']",
+    resultElementId: "[data-input='result']",
+    buttonId: "[data-button='submitButton']",
+  };
+  NumberValidator.create(numberValidatorArgs);
+});
