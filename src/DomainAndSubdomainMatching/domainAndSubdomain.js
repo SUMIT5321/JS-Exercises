@@ -3,54 +3,39 @@
  * wapper on {HTMLInputElement}, provides an functionality to validate
  * and parse the entered url to return domain and subdomain
  */
-class UrlInputBox {
-  static domainSubdomainRegex = /^(?:https?:\/\/)?(?:www\.)?(?:([^:/\n]+)\.)?([^:/\n]+\.[^:/\n?#]+)$/;
-
-  constructor(inputFiled) {
-    this.inputFiled = inputFiled;
-  }
-
-  parseDomainAndSubdomain() {
-    const matches = UrlInputBox.domainSubdomainRegex.exec(this.inputFiled.value);
-
-    return matches ? {
-      subdoamin: matches[1],
-      domain: matches[2],
-    } : null;
-  }
-
-  static create(inputfield) {
-    return new UrlInputBox(inputfield);
-  }
-}
+const urlParser = {
+  domainSubdomainRegex: /^(?:https?:\/\/)?(?:(?<subdomain>[^:/\n]+)\.)?(?<domain>[^:/\n]+\.[^:/\n\s?#]+)/,
+  parseDomainAndSubdomain(url) {
+    const matches = urlParser.domainSubdomainRegex.exec(url);
+    return matches ? matches.groups : null;
+  },
+};
 
 class CustomForm {
-  constructor(form) {
+  constructor({ form, urlField }) {
     this.form = form;
+    this.urlField = urlField;
   }
 
   init() {
-    const urlField = this.form.querySelector("[data-type='url']");
-    this.urlField = UrlInputBox.create(urlField);
-
     this.form.addEventListener("submit", (e) => this.handleFormSubmit(e));
   }
 
   handleFormSubmit(event) {
     event.preventDefault();
-    if (this.urlField.inputFiled.value === "") {
+    if (this.urlField.value === "") {
       alert("Please enter a URL");
       return;
     }
-    const domainSubdoamin = this.urlField.parseDomainAndSubdomain();
-    CustomForm.showDomainSubdoamin(domainSubdoamin);
+    const domainSubdomain = urlParser.parseDomainAndSubdomain(this.urlField.value);
+    CustomForm.showDomainSubdomain(domainSubdomain);
   }
 
-  static showDomainSubdoamin(domainSubdoamin) {
-    if (domainSubdoamin) {
-      let msg = `Domain: ${domainSubdoamin.domain}`;
-      if (domainSubdoamin.subdoamin) {
-        msg += `, Subdomain: ${domainSubdoamin.subdoamin}.`;
+  static showDomainSubdomain(domainSubdomain) {
+    if (domainSubdomain) {
+      let msg = `Domain: ${domainSubdomain.domain}`;
+      if (domainSubdomain.subdomain) {
+        msg += `, Subdomain: ${domainSubdomain.subdomain}.`;
       } else {
         msg += ".";
       }
@@ -60,10 +45,18 @@ class CustomForm {
     }
   }
 
-  static create(form) {
-    const customForm = new CustomForm(form);
+  static create({ formId, urlFieldId }) {
+    const form = document.querySelector(formId);
+    const urlField = form.querySelector(urlFieldId);
+    const customForm = new CustomForm({ form, urlField });
     customForm.init();
   }
 }
 
-window.addEventListener("load", () => CustomForm.create(document.forms[0]));
+window.addEventListener("load", () => {
+  const params = {
+    formId: "[data-form='urlForm']",
+    urlFieldId: "[data-type='url']",
+  };
+  CustomForm.create(params);
+});
