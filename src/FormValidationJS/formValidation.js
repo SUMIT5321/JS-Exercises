@@ -110,4 +110,4 @@ class UserForm {
   }
 }
 
-window.addEventListener("load", () => UserForm.createUserForm(document.forms[0]));
+window.addEventListener("load", () => UserForm.createUserForm(document.querySelector("[data-form='userForm']")));
