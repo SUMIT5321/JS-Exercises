@@ -3,9 +3,10 @@ function showAlert(msg) {
   alert(msg);
 }
 
+const EMAIL_PATTERN = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+const URL_PATTERN = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
+
 const validator = {
-  emailPattern: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-  urlPattern: /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/,
   validateTextLength(...[fieldName, value, minLength]) {
     return value && value.trim().length >= minLength ? null : `Enter atleast ${minLength} characters in ${fieldName}`;
   },
@@ -13,10 +14,10 @@ const validator = {
     return (this.validateTextLength(fieldName, value, 1) === null) ? null : `${fieldName} can't be empty.`;
   },
   validateEmail(...[, value]) {
-    return this.emailPattern.test(value) ? null : "Enter a valid email";
+    return EMAIL_PATTERN.test(value) ? null : "Enter a valid email";
   },
   validateUrl(...[fieldName, value]) {
-    return this.urlPattern.test(value) ? null : `Enter a valid ${fieldName} URL`;
+    return URL_PATTERN.test(value) ? null : `Enter a valid ${fieldName} URL`;
   },
 };
 
@@ -47,16 +48,18 @@ class UserForm {
    * @param {MouseEvent} event
    */
   handleSubmit(event) {
-    event.preventDefault();
     const fieldValues = this.extractFormData();
     const formErrors = UserForm.validate(fieldValues);
     if (formErrors.length) {
       event.preventDefault(); // prevent form submission
       formErrors.forEach((error) => showAlert(error));
     } else {
+      if (fieldValues.receiveNotification && !UserForm.showNotificationConfirmationModal()) {
+        event.preventDefault();
+        return;
+      }
       showAlert("Thanks. Received your details.");
     }
-    this.fieldValues = {}; // refresh field values
   }
 
   /**
@@ -64,6 +67,11 @@ class UserForm {
    */
   init() {
     this.form.addEventListener("submit", (e) => this.handleSubmit(e));
+  }
+
+  static showNotificationConfirmationModal() {
+    // eslint-disable-next-line no-restricted-globals, no-alert
+    return confirm("You will be receiving notification on profile comments. If you are good, press 'OK' otherwise 'Cancel'.");
   }
 
   /**
@@ -97,7 +105,6 @@ class UserForm {
     validateField(validator.validateIsNotEmpty, "timeZone", fieldValues.timeZone);
     if (validateField(validator.validateIsNotEmpty, "Home page", fieldValues.homePage)) validateField(validator.validateUrl, "Home page", fieldValues.homePage);
     validateField(validator.validateTextLength, "About me", fieldValues.aboutMe, 50);
-    if (!fieldValues.receiveNotification) errorMsgs.push("Please check receive comment notifications");
 
     return errorMsgs;
   }
