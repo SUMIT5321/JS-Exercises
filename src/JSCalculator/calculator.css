@@ -19,7 +19,7 @@
     border-radius: 10px;
 }
 
-.calculator form input {
+.calculator input {
     border: 0;
     outline: 0;
     width: 64px;
@@ -32,13 +32,13 @@
     background: #4f5052;
 }
 
-form .display {
+.display {
     display: flex;
     justify-content: flex-end;
     margin: 20px 0;
 }
 
-form .display input {
+.display input {
     text-align: right;
     padding-left: 20px;
     padding-right: 20px;
@@ -47,6 +47,6 @@ form .display input {
     background: #4f5052;
 }
 
-form input.equal {
+input.equal {
     width: 150px;
 }
