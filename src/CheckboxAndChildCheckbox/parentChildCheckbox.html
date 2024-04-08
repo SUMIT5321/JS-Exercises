@@ -6,29 +6,7 @@
     <body>
         <div class="container">
             <h1>Parent child checkboxes</h1>
-            <div class="innerContainer">
-                <form>
-                    <div id="color-container">
-                        <input type="checkbox" id="cb-color" name="cb-parent" value="color" />
-                        <label for="cb-color">Color</label><br>
-                    </div>
-
-                    <div id="drinks-container">
-                        <input type="checkbox" id="cb-drinks" name="cb-parent" value="drinks" />
-                        <label for="cb-drinks">Drinks</label><br>
-                    </div>
-                    
-                    <div id="movie-container">
-                        <input type="checkbox" id="cb-movie" name="cb-parent" value="movie" />
-                        <label for="cb-movie">Movie</label><br>
-                    </div>
-                    
-                    <div id="bikes-container">
-                        <input type="checkbox" id="cb-bike" name="cb-parent" value="bikes" />
-                        <label for="cb-bike">Bikes</label><br>
-                    </div>
-                </form>
-            </div>
+            <div class="innerContainer" data-container="nestedCheckbox" />
         </div>
         <script src="parentChildCheckbox.js"></script>
     </body>

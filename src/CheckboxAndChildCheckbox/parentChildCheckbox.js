@@ -1,4 +1,4 @@
-const childCheckBoxes = {
+const checkBoxData = {
   color: ["Red", "Yellow", "Green", "Blue"],
   movie: ["Dar", "Sir"],
   drinks: ["Coke", "Pepsi", "Dew"],
@@ -6,67 +6,74 @@ const childCheckBoxes = {
 };
 
 class NestedCheckbox {
-  constructor(parentCheckbox, chidrenData) {
-    this.parentCheckbox = parentCheckbox;
-    this.chidrenData = chidrenData;
-
-    parentCheckbox.addEventListener("click", this.handleParentCheckboxSelection.bind(this));
+  constructor({ containerId, data }) {
+    this.container = document.querySelector(containerId);
+    this.data = data;
+    this.#init();
   }
 
-  handleParentCheckboxSelection() {
-    const { parentElement } = this.parentCheckbox;
+  #init() {
+    const checkboxInnerContainer = document.createElement("div");
+    checkboxInnerContainer.classList.add("checkBoxContainer");
+    Object.keys(this.data).forEach((key) => {
+      const cb = this.createCheckbox(key, false, this.handleParentCheckboxSelection.bind(this));
+      checkboxInnerContainer.appendChild(cb);
+    });
+    this.container.appendChild(checkboxInnerContainer);
+  }
 
-    if (this.parentCheckbox.checked === true) {
-      this.addChildCheckboxes();
+  createCheckbox(label, checked, handleChange) {
+    const cbInput = document.createElement("input");
+    cbInput.type = "checkbox";
+    cbInput.id = `id-${label}`;
+    cbInput.value = label;
+    cbInput.dataset.key = label;
+    cbInput.checked = checked;
+    cbInput.onchange = (event) => handleChange(event);
+
+    const spaceTextNode = document.createTextNode("\t");
+
+    const cbLabel = document.createElement("label");
+    const tn = document.createTextNode(label);
+    cbLabel.htmlFor = cbInput.id;
+    cbLabel.appendChild(tn);
+
+    const parentDiv = document.createElement("div");
+    parentDiv.appendChild(cbInput);
+    parentDiv.appendChild(spaceTextNode);
+    parentDiv.appendChild(cbLabel);
+    return parentDiv;
+  }
+
+  /**
+   * Handle parent checkbox selection
+   * @param {MouseEvent} event
+   */
+  handleParentCheckboxSelection(event) {
+    const parentCb = event.target;
+    if (parentCb.checked === true) {
+      this.addChildCheckboxes(parentCb);
     } else {
-      parentElement.removeChild(parentElement.lastChild);
+      parentCb.parentElement.removeChild(parentCb.parentElement.lastChild);
     }
   }
 
   /**
   * Adds child checkboxes for given input checkbox
   */
-  addChildCheckboxes() {
+  addChildCheckboxes(parentCb) {
     const childContainer = document.createElement("div");
     childContainer.classList.add("childContainer");
-    const children = this.chidrenData;
+    const children = this.data[parentCb.dataset.key];
 
-    children.forEach((element, position) => {
-      childContainer.appendChild(this.createChildCheckbox(element, position));
+    children.forEach((element) => {
+      childContainer.appendChild(
+        this.createCheckbox(element, true, this.handleChildCheckboxClick.bind(this)),
+      );
     });
 
-    this.parentCheckbox.parentElement.append(childContainer);
-    this.parentCheckbox.scrollIntoView({ behavior: "smooth" });
-  }
-
-  /**
-   * Creates a checkbox, returns it wrapped in a DocumentFragment
-   * @param {String} data - data to be used to create child checkbox
-   * @param {Number} position - postion of the checkbox in the list
-   * @returns {DocumentFragment} - returns DocumentFragment wrapping checkbox with its lable
-   */
-  createChildCheckbox(data, position) {
-    const fragment = document.createDocumentFragment();
-    const checkbox = document.createElement("input");
-    const spaceTextNode = document.createTextNode("\t");
-    const br = document.createElement("br");
-    checkbox.type = "checkbox";
-    checkbox.name = data;
-    checkbox.id = data;
-    checkbox.value = data;
-    checkbox.checked = true;
-    checkbox.onclick = this.handleChildCheckboxClick.bind(this);
-
-    const label = document.createElement("label");
-    const tn = document.createTextNode(data);
-    label.htmlFor = data;
-    label.appendChild(tn);
-
-    if (position !== 0) fragment.appendChild(br);
-    fragment.appendChild(checkbox);
-    fragment.appendChild(spaceTextNode);
-    fragment.appendChild(label);
-    return fragment;
+    parentCb.parentElement.append(childContainer);
+    parentCb.scrollIntoView({ behavior: "smooth" });
   }
 
   /**
@@ -75,20 +82,27 @@ class NestedCheckbox {
    */
   handleChildCheckboxClick(event) {
     const childView = event.target;
-    const childContainer = childView.parentElement;
+    const childContainer = childView.parentElement.parentElement;
 
-    const areAllChecked = [...childContainer.childNodes].reduce(
-      ((previous, current) => current.checked || previous),
-      false,
-    );
+    const areAllChecked = [...childContainer.childNodes].some((element) => element.querySelector("input").checked);
 
     if (!areAllChecked) {
       const superParent = childContainer.parentElement;
       superParent.removeChild(childContainer);
-      this.parentCheckbox.checked = false;
+      superParent.querySelector("input").checked = false;
     }
+  }
+
+  static create(params) {
+    const nestedCheckBox = new NestedCheckbox(params);
+    return nestedCheckBox;
   }
 }
 
-// add click listener to all parent checkboxes
-document.getElementsByName("cb-parent").forEach((element) => new NestedCheckbox(element, childCheckBoxes[element.value]));
+window.addEventListener("load", () => {
+  const params = {
+    containerId: "[data-container='nestedCheckbox']",
+    data: checkBoxData,
+  };
+  NestedCheckbox.create(params);
+});
