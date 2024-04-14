@@ -53,3 +53,9 @@ select {
   align-items: center;
   justify-content: space-around;
 }
+
+button:disabled {
+  background-color: grey;
+  opacity: 0.5;
+  filter: alpha(opacity=70);
+}

@@ -11,16 +11,16 @@
 
         <div class="multiSelectContainer">
           <div class="selectContainer">
-            <select multiple="multiple" id='lstBoxLeft'></select>
+            <select multiple="multiple" id='lstBoxLeft' data-select="leftbox"></select>
           </div>
     
           <div style="display: flex; flex-direction: column; justify-content: space-around;">
-            <div id="buttonAdd" class="button">Add <i class="fa fa-caret-right"></i></div>
-            <div id="buttonRemove" class="button"><i class="fa fa-caret-left"></i> Remove</div>
+            <button id="buttonAdd" class="button" data-button="add">Add <i class="fa fa-caret-right"></i></button>
+            <button id="buttonRemove" class="button" data-button="remove"><i class="fa fa-caret-left"></i> Remove</button>
           </div>
           
           <div class="selectContainer">
-            <select multiple="multiple" id='lstBoxRight'></select>
+            <select multiple="multiple" id='lstBoxRight' data-select="rightbox"></select>
           </div>
         </div>
       </div>
